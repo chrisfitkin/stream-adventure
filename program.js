@@ -5,14 +5,23 @@
 
 var through = require('through2');
 var stream = through(write, end);
-
-process.stdin.pipe(stream).pipe(process.stdout);
+var split = require('split');
+var lineCount = 0;
 
 function write(buffer, encoding, next) {
-  this.push(buffer.toString().toUpperCase());
+  var response;
+  var odd = (lineCount % 2 === 0)
+  response = buffer.toString().toLowerCase();
+  if (!odd) {
+    response = response.toUpperCase();
+  }
+  this.push(response + '\n');
+  lineCount++;
   next();
 }
 
 function end(done) {
   done();
 }
+
+process.stdin.pipe(split()).pipe(stream).pipe(process.stdout);
